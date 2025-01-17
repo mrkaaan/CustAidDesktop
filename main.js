@@ -9,8 +9,8 @@ function createWindow () {
     const { width, height } = primaryDisplay.workAreaSize;
 
     // 窗口的宽度和高度
-    const winWidth = 800;
-    const winHeight = 800;
+    const winWidth = 300;
+    const winHeight = 400;
 
     // 计算窗口的 x 和 y 坐标
     const x = Math.floor((width - winWidth) * 9 / 10); // 四分之三位置
@@ -32,36 +32,18 @@ function createWindow () {
     win.loadFile('./pages/index.html');
 
 
-    // 监听从渲染进程发来的消息
-    ipcMain.on('update-window-position', (_,data) => {
-        const { x, y } = data;
-        console.log('update-window-position', x, y);
-        
+    
+    ipcMain.on('minimize-window', () => {
         if (win) {
-            win.setPosition(x, y);
+            win.minimize();
         }
     });
 
-    
-    // 监听从渲染进程发来的消息
-    ipcMain.handle('get-window-position', () => {
+    ipcMain.on('close-window', () => {
         if (win) {
-            const position = win.getPosition();
-            return{ x: position[0], y: position[1] }
+            win.close();
         }
     });
-    
-    // ipcMain.on('minimize-window', () => {
-    //     if (win) {
-    //     win.minimize();
-    //     }
-    // });
-
-    // ipcMain.on('close-window', () => {
-    //     if (win) {
-    //     win.close();
-    //     }
-    // });
 
 }
 

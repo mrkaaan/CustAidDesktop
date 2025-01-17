@@ -8,13 +8,17 @@
 <body>
   <div id="custom-title-bar">
     <span id="app-title"></span>
-    <button id="minimize-btn">-</button>
-    <button id="close-btn">×</button>
+    <div id="btn">
+      <button id="minimize-btn">-</button>
+      <button id="close-btn">×</button>
+    </div>
   </div>
-  <h1>Hello World!</h1>
-  <p>We are using node <script>document.write(process.versions.node)</script>, 
-    Chrome <script>document.write(process.versions.chrome)</script>, and 
-    Electron <script>document.write(process.versions.electron)</script>.</p>
-  <script src="render.js"></script>
+  <div id="content">
+    <h1>Hello World!</h1>
+    <p>We are using node <script>document.write(process.versions.node)</script>, 
+      Chrome <script>document.write(process.versions.chrome)</script>, and 
+      Electron <script>document.write(process.versions.electron)</script>.</p>
+    <script src="render.js"></script>
+  </div>
 </body>
 </html>
