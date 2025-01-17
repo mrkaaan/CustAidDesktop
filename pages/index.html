@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Electron App</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="custom-title-bar">
+    <span id="app-title"></span>
+    <button id="minimize-btn">-</button>
+    <button id="close-btn">×</button>
+  </div>
+  <h1>Hello World!</h1>
+  <p>We are using node <script>document.write(process.versions.node)</script>, 
+    Chrome <script>document.write(process.versions.chrome)</script>, and 
+    Electron <script>document.write(process.versions.electron)</script>.</p>
+  <script src="render.js"></script>
+</body>
+</html>
