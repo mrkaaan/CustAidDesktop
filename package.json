@@ -13,6 +13,7 @@
   "description": "",
   "devDependencies": {
     "electron": "^31.2.0",
+    "electron-drag": "^2.0.0",
     "nodemon": "^3.1.9"
   }
 }
