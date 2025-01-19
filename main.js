@@ -1,6 +1,6 @@
 const { app, BrowserWindow, screen, ipcMain, protocol } = require('electron');
 const path = require('path');
-const http = require('http');
+const WebSocket = require('ws');
 
 let win;
 
@@ -28,7 +28,9 @@ function createWindow () {
         skipTaskbar: true,     //不显示在任务栏
         webSecurity: false,    //允许跨域请求
         webPreferences: {
-        preload: path.join(__dirname, 'preload.js')
+          contextIsolation: true, // 推荐开启以提高安全性
+          nodeIntegration: false, // 推荐关闭以提高安全性
+          preload: path.join(__dirname, 'preload.js')
         }
     });
 
@@ -51,37 +53,46 @@ function createWindow () {
 app.whenReady().then(() => {
   createWindow();
 
-  // 创建 HTTP 服务器
-  const server = http.createServer((req, res) => {
-    if (req.method === 'POST' && req.url === '/send-data') {
-      let data = '';
-      req.on('data', (chunk) => {
-        data += chunk;
-      });
-      req.on('end', () => {
-        console.log('Received data:', data);
-        // 将数据发送到渲染进程
-        if (win) {
-          win.webContents.send('data-received', data);
-        } else {
-          console.log('Main window is not yet created');
-        }
-        res.writeHead(200, {
-          'Content-Type': 'text/plain',
-          'Access-Control-Allow-Origin': 'http://127.0.0.1:5500', // 允许来自 http://127.0.0.1:5500 的请求
-        });
-        res.end('Data received');
-      });
-    } else {
-      res.writeHead(404, {
-        'Access-Control-Allow-Origin': 'http://127.0.0.1:5500', // 允许来自 http://127.0.0.1:5500 的请求
-      });
-      res.end('Not Found');
-    }
+  // 创建 WebSocket 服务器
+  const wss = new WebSocket.Server({ port: 8082 });
+
+    // 添加启动成功日志
+  wss.on('listening', () => {
+    console.log('WebSocket server started on port 8082');
   });
 
-  server.listen(3000, '127.0.0.1', () => {
-    console.log('HTTP server running at http://127.0.0.1:3000/');
+  wss.on('connection', (ws) => {
+      console.log('Client connected');
+
+      ws.on('message', (message) => {
+        const data = JSON.parse(message);
+        console.log('Received data from plugin:', data);
+        if (win) {
+            console.log('Sending data to renderer');
+            win.webContents.send('data-from-plugin', JSON.stringify({type: 'data', ...data}));
+        } else {
+            console.log('No window found');
+        }
+      });
+
+      ws.on('close', () => {
+          console.log('Client disconnected');
+      });
+
+      // 发送消息给客户端
+      ws.send(JSON.stringify({ type: 'initial', message: 'Hello from Electron app!' }));
+
+      ipcMain.on('focus-tab', (event, tabId) => {
+        console.log('Focusing tab', tabId);
+        
+        // 发送消息给浏览器扩展
+        ws.send(JSON.stringify({ type:'data', action: 'focusTab', tabId: tabId }));
+      });
+  });
+
+  ipcMain.on('delete-tab', (event, tabId) => {
+    // 发送删除命令给插件端
+    socket.send(JSON.stringify({ action: 'delete', tabId }));
   });
 
   app.on('activate', () => {
