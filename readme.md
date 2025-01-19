@@ -1,4 +1,4 @@
-# CustAidPlugin
+# CustAidDesktop
 
 悬浮窗 - 悉犀客服平台辅助工具
 
